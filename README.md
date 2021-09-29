@@ -47,3 +47,13 @@ Helpful player commands:
         See the skript information
  
 ---------------
+
+
+PlayerLevel-Notif:
+--
+
+      /Messagemaxlevel <true/false/info>
+      or
+      /msgmaxlvl <true/false/info>
+        Hide the player's message when he reaches max level!
+        All players can execute this command! It's a personal command!
