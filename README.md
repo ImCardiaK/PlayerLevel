@@ -2,7 +2,14 @@
 Added a Level system to the game! The player does not need to execute command to level up. All of this is done automatically! The Skript is fully configurable!
 
 ------
-
+ Need of:
+ - TuSKe
+ - SkRayFall
+ - SkQuery
+ - Sk-NbeeT
+ - Skellett-Legacy
+ - SkBee
+ ----------
 
 Useful admin command:
 
