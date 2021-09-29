@@ -1,0 +1,361 @@
+options:
+    
+    #Allows to edit the number of xp (no-vanilla) that the player will gain when he breaks a block.
+    XpWinCoalOre: 0.3
+    XpWinIronOre: 0.6
+    XpWinGoldOre: 0.9
+    XpWinRedstoneOre: 1
+    XpWinLapisOre: 1.5
+    XpWinDiamondOre: 2.3
+    XpWinAncientDebris: 3.4
+    
+
+    #Activate or deactivate the possibility of earning XP with the blocks mentioned below
+    #If this is set to true, the player will gain xp by mining the corresponding blocks.
+    #If this is set to false, the player does not gain XP by mining the corresponding blocks.
+    CoalOre: true
+    IronOre: true
+    GoldOre: true
+    RedstoneOre: true
+    LapisOre: true
+    DiamondOre: true
+    AncientDebris: true
+
+    #Display statistics on the action-bar concerning the player's level.
+    ActionBarInfo: true
+
+
+    
+
+    
+    XpReset: true #If activate on "true": After leveling up the player starts again from 0 xp, until reaching the next level again. 
+                  #If activate on "false": the player will keep his xp (easier for players to level up)
+    
+
+    XpRequiredForStart: 1000  #The number of xp required for level 1 to 2
+                              #(this will be multiplied by the "MultiplierForNumberOfXpRequiredNextLevel" option for the next levels)
+    
+
+    MaxLevelLimit: 100 #The maximum level a player can reach !
+
+
+    #Used to multiply the number of xp required by the number indicated.
+    #Basically, for level 1 to 2 the player needs 1000 xp! The multiplier on 3, will multiply 1000 by 3 for level 2 to 3 etc...
+    MultiplierForNumberOfXpRequiredNextLevel: 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#-----------------------------------------------------------------
+#                                                                I
+#                       Basic Variables                          I
+#                                                                I
+#-----------------------------------------------------------------
+variables:
+
+    {SmallLevel.%player%} = 0
+    {Level.%player%} = 1
+    {SmallLevelRequired.%player%} = {@XpRequiredFor1-2}
+    {MaxLevel.%player%} = {@MaxLevelLimit}
+
+
+#-----------------------------------------------------------------
+#                                                                I
+#                       Commands                                 I
+#                                                                I
+#-----------------------------------------------------------------
+command /editxp <player> <number>:
+    trigger:
+        if arg 1 is set:
+            if arg 2 is set:
+                set {SmallLevel.%arg 1%} to arg 2
+                send "&aIt is a success ! The &eXP &aof the player &6%arg 1% &ato was edited on &e%arg 2%" to sender
+                send "&dYour XP has been changed to &b%arg 2% &dby &3%sender%" to arg 1
+                execute arg 1 command "actionbar§"
+
+command /editlevel <player> <number>:
+    trigger:
+        if arg 1 is set:
+            if arg 2 is set:
+                set {Level.%arg 1%} to arg 2
+                send "&aIt is a success ! The &eLevel &aof the player &6%arg 1% &ato was edited on &e%arg 2%" to sender
+                send "&dYour level has been changed to &b%arg 2% &dby &3%sender%" to arg 1
+                execute arg 1 command "actionbar§"
+
+command /editrequiredxp <player> <number>:
+    aliases: editrxp
+    trigger:
+        if arg 1 is set:
+            if arg 2 is set:
+                set {SmallLevelRequired.%arg 1%} to arg 2
+                send "&aIt is a success ! The &erequired XP &aof the player &6%arg 1% &ato was edited on &e%arg 2%" to sender
+                send "&dYour required XP has been changed to &b%arg 2% &dby &3%sender%" to arg 1
+                execute arg 1 command "actionbar§"
+
+command /resetalllevel <player>:
+    trigger:
+        set {SmallLevelRequired.%arg 1%} to 1000
+        set {Level.%arg 1%} to 1
+        set {SmallLevel.%arg 1%} to 0
+        set {MaxLevel.%player%} to {@MaxLevelLimit}
+        execute arg 1 command "actionbar§"
+        send "&aIt is a success !" to sender
+
+#-----------------------------------------------------------------
+#                                                                I
+#                       On Break Ore                             I
+#                                                                I
+#-----------------------------------------------------------------
+on break of coal ore:
+    if {@CoalOre} = true:
+        if player's tool is a diamond pickaxe or iron pickaxe or stone pickaxe or netherite pickaxe or diamond sword or iron sword or stone sword or netherite sword:
+            if {SmallLevel.%player%} >= {SmallLevelRequired.%player%}:
+                set {SmallLevelRequired.%player%} to {SmallLevelRequired.%player%}*{@MultiplierForNumberOfXpRequiredNextLevel}
+                add 1 to {Level.%player%}
+                send "&a&lYou have gained a Level!" to player
+                play sound "entity.arrow.shoot" with volume 100 with pitch 1 at player for player
+                if {@XpReset} = true:
+                    set {SmallLevel.%player%} to 0
+            else if {Level.%player%} >= {@MaxLevelLimit}:
+                if {MaximumLevelReachedMessage.%player%} = true:
+                    send "&c&lWAIT ! &cYou have reached the maximum level! :D"
+            else:
+                add {@XpWinCoalOre} to {SmallLevel.%player%}
+        if {@ActionBarInfo} = true:
+            execute player command "actionbar§"
+        set lore of player's tool to "&b&m&l             " and "&b&lRequired:" and "&e%{SmallLevel.%player%}% Xp &7/ &6%{SmallLevelRequired.%player%}%" and "&b&m&l             " and "&b&lActually Level:" and "&a&o%{Level.%player%}%"
+
+
+on break of iron ore:
+    if {@IronOre} = true:
+        if player's tool is a diamond pickaxe or iron pickaxe or stone pickaxe or netherite pickaxe or diamond sword or iron sword or stone sword or netherite sword:
+            if {SmallLevel.%player%} >= {SmallLevelRequired.%player%}:
+                set {SmallLevelRequired.%player%} to {SmallLevelRequired.%player%}*{@MultiplierForNumberOfXpRequiredNextLevel}
+                add 1 to {Level.%player%}
+                send "&a&lYou have gained a Level!" to player
+                play sound "entity.arrow.shoot" with volume 100 with pitch 1 at player for player
+                if {@XpReset} = true:
+                    set {SmallLevel.%player%} to 0
+            else if {Level.%player%} >= {@MaxLevelLimit}:
+                if {MaximumLevelReachedMessage.%player%} = true:
+                    send "&c&lWAIT ! &cYou have reached the maximum level! :D"
+            else:
+                add {@XpWinIronOre} to {SmallLevel.%player%}
+        if {@ActionBarInfo} = true:
+            execute player command "actionbar§"
+        set lore of player's tool to "&b&m&l             " and "&b&lRequired:" and "&e%{SmallLevel.%player%}% Xp &7/ &6%{SmallLevelRequired.%player%}%" and "&b&m&l             " and "&b&lActually Level:" and "&a&o%{Level.%player%}%"
+
+
+on break of gold ore:
+    if {@GoldOre} = true:
+        if player's tool is a diamond pickaxe or iron pickaxe or stone pickaxe or netherite pickaxe or diamond sword or iron sword or stone sword or netherite sword:
+            if {SmallLevel.%player%} >= {SmallLevelRequired.%player%}:
+                set {SmallLevelRequired.%player%} to {SmallLevelRequired.%player%}*{@MultiplierForNumberOfXpRequiredNextLevel}
+                add 1 to {Level.%player%}
+                send "&a&lYou have gained a Level!" to player
+                play sound "entity.arrow.shoot" with volume 100 with pitch 1 at player for player
+                if {@XpReset} = true:
+                    set {SmallLevel.%player%} to 0
+            else if {Level.%player%} >= {@MaxLevelLimit}:
+                if {MaximumLevelReachedMessage.%player%} = true:
+                    send "&c&lWAIT ! &cYou have reached the maximum level! :D"
+            else:
+                add {@XpWinGoldOre} to {SmallLevel.%player%}
+        if {@ActionBarInfo} = true:    
+            execute player command "actionbar§"
+        set lore of player's tool to "&b&m&l             " and "&b&lRequired:" and "&e%{SmallLevel.%player%}% Xp &7/ &6%{SmallLevelRequired.%player%}%" and "&b&m&l             " and "&b&lActually Level:" and "&a&o%{Level.%player%}%"
+
+
+on break of redstone ore:
+    if {@RedstoneOre} = true:
+        if player's tool is a diamond pickaxe or iron pickaxe or stone pickaxe or netherite pickaxe or diamond sword or iron sword or stone sword or netherite sword:
+            if {SmallLevel.%player%} >= {SmallLevelRequired.%player%}:
+                set {SmallLevelRequired.%player%} to {SmallLevelRequired.%player%}*{@MultiplierForNumberOfXpRequiredNextLevel}
+                add 1 to {Level.%player%}
+                send "&a&lYou have gained a Level!" to player
+                play sound "entity.arrow.shoot" with volume 100 with pitch 1 at player for player
+                if {@XpReset} = true:    
+                    set {SmallLevel.%player%} to 0
+            else if {Level.%player%} >= {@MaxLevelLimit}:
+                if {MaximumLevelReachedMessage.%player%} = true:
+                    send "&c&lWAIT ! &cYou have reached the maximum level! :D"
+            else:
+                add {@XpWinRedstoneOre} to {SmallLevel.%player%}
+        if {@ActionBarInfo} = true:
+            execute player command "actionbar§"
+        set lore of player's tool to "&b&m&l             " and "&b&lRequired:" and "&e%{SmallLevel.%player%}% Xp &7/ &6%{SmallLevelRequired.%player%}%" and "&b&m&l             " and "&b&lActually Level:" and "&a&o%{Level.%player%}%"
+
+
+on break of lapis ore:
+    if {@LapisOre} = true:
+        if player's tool is a diamond pickaxe or iron pickaxe or stone pickaxe or netherite pickaxe or diamond sword or iron sword or stone sword or netherite sword:
+            if {SmallLevel.%player%} >= {SmallLevelRequired.%player%}:
+                set {SmallLevelRequired.%player%} to {SmallLevelRequired.%player%}*{@MultiplierForNumberOfXpRequiredNextLevel}
+                add 1 to {Level.%player%}
+                send "&a&lYou have gained a Level!" to player
+                play sound "entity.arrow.shoot" with volume 100 with pitch 1 at player for player
+                if {@XpReset} = true:    
+                    set {SmallLevel.%player%} to 0
+            else if {Level.%player%} >= {@MaxLevelLimit}:
+                if {MaximumLevelReachedMessage.%player%} = true:
+                    send "&c&lWAIT ! &cYou have reached the maximum level! :D"
+            else:
+                add {@XpWinLapisOre} to {SmallLevel.%player%}
+        if {@ActionBarInfo} = true:
+            execute player command "actionbar§"
+        set lore of player's tool to "&b&m&l             " and "&b&lRequired:" and "&e%{SmallLevel.%player%}% Xp &7/ &6%{SmallLevelRequired.%player%}%" and "&b&m&l             " and "&b&lActually Level:" and "&a&o%{Level.%player%}%"
+
+
+on break of diamond ore:
+    if {@DiamondOre} = true:
+        if player's tool is a diamond pickaxe or iron pickaxe or stone pickaxe or netherite pickaxe or diamond sword or iron sword or stone sword or netherite sword:
+            if {SmallLevel.%player%} >= {SmallLevelRequired.%player%}:
+                set {SmallLevelRequired.%player%} to {SmallLevelRequired.%player%}*{@MultiplierForNumberOfXpRequiredNextLevel}
+                add 1 to {Level.%player%}
+                send "&a&lYou have gained a Level!" to player
+                play sound "entity.arrow.shoot" with volume 100 with pitch 1 at player for player
+                if {@XpReset} = true:    
+                    set {SmallLevel.%player%} to 0
+            else if {Level.%player%} >= {@MaxLevelLimit}:
+                if {MaximumLevelReachedMessage.%player%} = true:
+                    send "&c&lWAIT ! &cYou have reached the maximum level! :D"
+            else:
+                add {@XpWinDiamondOre} to {SmallLevel.%player%}
+        if {@ActionBarInfo} = true:    
+            execute player command "actionbar§"
+        set lore of player's tool to "&b&m&l             " and "&b&lRequired:" and "&e%{SmallLevel.%player%}% Xp &7/ &6%{SmallLevelRequired.%player%}%" and "&b&m&l             " and "&b&lActually Level:" and "&a&o%{Level.%player%}%"
+
+
+on break of ancient debris:
+    if {@AncientDebris} = true:
+        if player's tool is a diamond pickaxe or iron pickaxe or stone pickaxe or netherite pickaxe or diamond sword or iron sword or stone sword or netherite sword:
+            if {SmallLevel.%player%} >= {SmallLevelRequired.%player%}:
+                set {SmallLevelRequired.%player%} to {SmallLevelRequired.%player%}*{@MultiplierForNumberOfXpRequiredNextLevel}
+                add 1 to {Level.%player%}
+                send "&a&lYou have gained a Level!" to player
+                play sound "entity.arrow.shoot" with volume 100 with pitch 1 at player for player
+                if {@XpReset} = true:    
+                    set {SmallLevel.%player%} to 0
+            else if {Level.%player%} >= {@MaxLevelLimit}:
+                if {MaximumLevelReachedMessage.%player%} = true:
+                    send "&c&lWAIT ! &cYou have reached the maximum level! :D"
+            else:
+                add {@XpWinAncientDebris} to {SmallLevel.%player%}
+        if {@ActionBarInfo} = true:
+            execute player command "actionbar§"
+        set lore of player's tool to "&b&m&l             " and "&b&lRequired:" and "&e%{SmallLevel.%player%}% Xp &7/ &6%{SmallLevelRequired.%player%}%" and "&b&m&l             " and "&b&lActually Level:" and "&a&o%{Level.%player%}%"
+
+
+
+
+#-----------------------------------------------------------------
+#                                                                I
+#                         Settings                               I
+#                                                                I
+#-----------------------------------------------------------------
+
+
+every 5 seconds in world "world2":
+    loop all players:
+        if loop-player is holding a diamond pickaxe or iron pickaxe or stone pickaxe or netherite pickaxe or diamond sword or iron sword or stone sword or netherite sword: 
+            set lore of loop-player's tool to "&b&m&l             " and "&b&lPlayer Level:" and "&3%{SmallLevel.%loop-player%}% Xp &7/ &b%{SmallLevelRequired.%loop-player%}%" and "&7&m&l             " and "&a&lActually Level:" and "&a%{Level.%loop-player%}%" and "&7&m&l             " and "&d&lNext Level:" and "&d%{Level.%loop-player%} + 1%"
+
+command /actionbar§:
+    trigger:
+        loop 2 times:
+            set action bar of player to "&0&l| &b&lRequired: &a%{SmallLevel.%player%}% Xp &7/ &a%{SmallLevelRequired.%player%}%       &b&lActually Level: &a%{Level.%player%}%       &b&lNext Level: &a%{Level.%player%} + 1% &0&l|"
+            wait 2.5 seconds

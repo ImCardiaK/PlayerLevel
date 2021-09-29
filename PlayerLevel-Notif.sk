@@ -1,0 +1,29 @@
+variables:
+    {MaximumLevelReachedMessage.%player%} = true
+
+command /messagemaxlevel <text>:
+    aliases: msgmaxlvl
+    usage: &c/msgmaxlvl &7true&8/&7false&8/&7info
+    trigger:
+        if arg 1 is "info":
+            send "&a&lMessage: &c%{MaximumLevelReachedMessage.%player%}%" to player
+        if arg 1 is "true":
+            send "&4&lMessage unmuted !" to player
+            set {MaximumLevelReachedMessage.%player%} to true
+        if arg 1 is "false":
+            send "&a&lMessage muted !" to player
+            set {MaximumLevelReachedMessage.%player%} to false
+
+command /playerlevel <text>:
+    trigger:
+        if player have permission "PlayerLevel.reload":
+            if arg-1 is "reload":
+                execute player command "sk reload PlayerLevel"
+                execute player command "sk reload Playerlevel-Notif"
+                execute player command "playerlevel about"
+                send "&bPlayerLevel reload ! :D" to player
+        if arg-1 is "about":
+            send " " to player
+            send "&bAuthor: &7ImCardiaK" to player
+            send "&bVersion: &71.0.0 " to player
+            send " " to player
